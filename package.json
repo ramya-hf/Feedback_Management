@@ -1,0 +1,31 @@
+{
+  "name": "feedback-management-system",
+  "version": "1.0.0",
+  "description": "Full-stack feedback management system with Django backend and React frontend",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd . && python manage.py runserver",
+    "frontend": "cd Frontend && npm run dev",
+    "install:all": "npm install && cd Frontend && npm install",
+    "build": "cd Frontend && npm run build",
+    "test": "cd Frontend && npm run test",
+    "lint": "cd Frontend && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "django",
+    "react",
+    "typescript",
+    "feedback",
+    "management",
+    "fullstack"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "your-repository-url"
+  }
+} 

@@ -3,11 +3,83 @@ from rest_framework import viewsets, status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Feedback, Comment
-from .serializers import FeedbackSerializer, FeedbackVoteSerializer, FeedbackStatusSerializer, FeedbackTagSerializer, FeedbackFileSerializer, CommentSerializer, CommentVoteSerializer, CommentModerationSerializer
+from .models import Board, Feedback, Comment
+from .serializers import BoardSerializer, BoardMemberSerializer, FeedbackSerializer, FeedbackVoteSerializer, FeedbackStatusSerializer, FeedbackTagSerializer, FeedbackFileSerializer, CommentSerializer, CommentVoteSerializer, CommentModerationSerializer
 from accounts.models import User
 
 # Create your views here.
+
+class IsBoardOwnerOrModerator(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.can_edit(request.user)
+
+class BoardViewSet(viewsets.ModelViewSet):
+    queryset = Board.objects.filter(is_active=True)
+    serializer_class = BoardSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['visibility', 'allow_anonymous_feedback', 'require_approval', 'allow_comments', 'allow_voting']
+    search_fields = ['name', 'description', 'slug']
+    ordering_fields = ['created_at', 'updated_at', 'feedback_count']
+
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            return [IsBoardOwnerOrModerator()]
+        return [permissions.IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='add-moderator')
+    def add_moderator(self, request, pk=None):
+        board = self.get_object()
+        serializer = BoardMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_id = serializer.validated_data['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+            board.moderators.add(user)
+            return Response({'detail': 'Moderator added.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'], url_path='remove-moderator')
+    def remove_moderator(self, request, pk=None):
+        board = self.get_object()
+        serializer = BoardMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_id = serializer.validated_data['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+            board.moderators.remove(user)
+            return Response({'detail': 'Moderator removed.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'], url_path='add-member')
+    def add_member(self, request, pk=None):
+        board = self.get_object()
+        serializer = BoardMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_id = serializer.validated_data['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+            board.members.add(user)
+            return Response({'detail': 'Member added.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['post'], url_path='remove-member')
+    def remove_member(self, request, pk=None):
+        board = self.get_object()
+        serializer = BoardMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_id = serializer.validated_data['user_id']
+        try:
+            user = User.objects.get(id=user_id)
+            board.members.remove(user)
+            return Response({'detail': 'Member removed.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 class IsFeedbackOwnerOrModerator(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

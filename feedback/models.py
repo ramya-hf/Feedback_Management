@@ -242,6 +242,19 @@ class Feedback(models.Model):
         help_text="Name for anonymous feedback (optional)"
     )
     
+    # Additional fields
+    file = models.FileField(
+        upload_to='feedback_files/',
+        null=True,
+        blank=True,
+        help_text="Attached file for feedback"
+    )
+    tags = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Tags for categorizing feedback"
+    )
+    
     class Meta:
         db_table = 'feedback_feedback'
         verbose_name = 'Feedback'
