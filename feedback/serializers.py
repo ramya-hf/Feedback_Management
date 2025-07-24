@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Board, Feedback
+from .models import Board, Feedback, Comment
 from accounts.models import User
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -58,3 +58,28 @@ class FeedbackTagSerializer(serializers.Serializer):
 
 class FeedbackFileSerializer(serializers.Serializer):
     file = serializers.FileField()
+
+class CommentSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author_name', read_only=True)
+    author_email = serializers.CharField(source='author_email', read_only=True)
+    vote_count = serializers.IntegerField(read_only=True)
+    reply_count = serializers.IntegerField(read_only=True)
+    is_reply = serializers.BooleanField(source='is_reply', read_only=True)
+    upvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    downvotes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    parent = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all(), required=False, allow_null=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'content', 'feedback', 'author', 'author_name', 'author_email', 'parent',
+            'is_reply', 'reply_count', 'upvotes', 'downvotes', 'vote_count',
+            'created_at', 'updated_at', 'is_active', 'anonymous_email', 'anonymous_name'
+        ]
+        read_only_fields = ['id', 'author', 'author_name', 'author_email', 'is_reply', 'reply_count', 'upvotes', 'downvotes', 'vote_count', 'created_at', 'updated_at']
+
+class CommentVoteSerializer(serializers.Serializer):
+    vote_type = serializers.ChoiceField(choices=['upvote', 'downvote'])
+
+class CommentModerationSerializer(serializers.Serializer):
+    is_active = serializers.BooleanField()
