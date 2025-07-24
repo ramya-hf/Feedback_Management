@@ -3,8 +3,8 @@ from rest_framework import viewsets, status, permissions, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Feedback, Comment
-from .serializers import FeedbackSerializer, FeedbackVoteSerializer, FeedbackStatusSerializer, FeedbackTagSerializer, FeedbackFileSerializer, CommentSerializer, CommentVoteSerializer, CommentModerationSerializer
+from .models import Board, Feedback, Comment
+from .serializers import BoardSerializer, FeedbackSerializer, CommentSerializer
 from accounts.models import User
 
 # Create your views here.
@@ -142,3 +142,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment.is_active = serializer.validated_data['is_active']
         comment.save()
         return Response({'detail': 'Comment moderation updated.'}, status=status.HTTP_200_OK)
+
+class BoardViewSet(viewsets.ModelViewSet):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer

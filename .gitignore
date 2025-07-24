@@ -1,0 +1,82 @@
+# ====================================
+# Python
+# ====================================
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ====================================
+# Django
+# ====================================
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+.env
+.env.*
+
+# Migrations - optional (ignore if auto-generated or to keep clean history)
+**/migrations/*.py
+!**/migrations/__init__.py
+**/migrations/__pycache__/
+
+# ====================================
+# VS Code
+# ====================================
+.vscode/
+.history/
+
+# ====================================
+# Environments & Tools
+# ====================================
+venv/
+env/
+ENV/
+.venv/
+pip-wheel-metadata/
+Pipfile.lock
+poetry.lock
+.poetry/
+coverage/
+htmlcov/
+.cache/
+.pytest_cache/
+.tox/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+.pyright/
+.ipynb_checkpoints/
+
+# ====================================
+# macOS / Windows
+# ====================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ====================================
+# Git
+# ====================================
+*.orig
+*.rej
+
+# ====================================
+# Logs & Dumps
+# ====================================
+*.log
+*.sql
+*.sqlite3
+*.dump
+*.tmp
+*.pid
